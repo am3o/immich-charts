@@ -2,11 +2,16 @@
 global:
   nameOverride: server
 
-{{- if .Values.immich.configuration }}
 defaultPodOptions:
+  {{- if .Values.immich.configuration }}
   annotations:
     checksum/config: {{ .Values.immich.configuration | toYaml | sha256sum }}
-{{- end }}
+  {{- end }}
+  securityContext:
+    runAsUser: {{ .Values.immich.securityContext.runAsUser | default 1000 }}
+    runAsGroup: {{ .Values.immich.securityContext.runAsGroup | default 1000 }}
+    fsGroup: {{ .Values.immich.securityContext.fsGroup | default 1000 }}
+    runAsNonRoot: {{ if hasKey .Values.immich.securityContext "runAsNonRoot" }}{{ .Values.immich.securityContext.runAsNonRoot }}{{ else }}true{{ end }}
 
 controllers:
   main:
